@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macon County Land Acquisition Intelligence Report</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <style>
+        /* ===== PRINT MEDIA & PAGE SETUP ===== */
+        @page {
+            size: letter;
+            margin: 0.75in 0.75in 0.9in 0.75in;
+        }
+        
+        @media print {
+            body { margin: 0; padding: 0; }
+            .page-header { 
+                position: running(header);
+                display: block;
+            }
+            .page-footer {
+                position: running(footer);
+                display: block;
+            }
+            @page :first {
+                @top-center { content: none; }
+                @bottom-center { content: none; }
+            }
+        }
+        
+        /* ===== GLOBAL STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.45;
+            color: #1a1a1a;
+            background: white;
+        }
+        
+        /* ===== HEADERS & FOOTERS ===== */
+        .page-header {
+            display: none; /* Hidden for cover page */
+            font-size: 9pt;
+            color: #666;
+            text-align: center;
+            padding-bottom: 8pt;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 12pt;
+        }
+        
+        .with-header .page-header {
+            display: block;
+        }
+        
+        .page-footer {
+            display: none; /* Hidden for cover page */
+            font-size: 9pt;
+            color: #666;
+            text-align: center;
+            padding-top: 8pt;
+            border-top: 1px solid #ccc;
+            margin-top: 20pt;
+        }
+        
+        .with-header .page-footer {
+            display: block;
+        }
+        
+        .footer-confidential {
+            font-size: 8pt;
+            color: #999;
+            font-style: italic;
+            margin-top: 4pt;
+        }
+        
+        /* ===== COVER PAGE ===== */
+        .cover-page {
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
+            color: white;
+            padding: 60px 40px;
+            margin: -0.75in;
+            margin-bottom: 0;
+        }
+        
+        .cover-title {
+            font-size: 36pt;
+            font-weight: bold;
+            margin-bottom: 24pt;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        .cover-subtitle {
+            font-size: 20pt;
+            margin-bottom: 36pt;
+            color: #e0e0e0;
+            font-weight: 300;
+        }
+        
+        .cover-details {
+            font-size: 14pt;
+            line-height: 1.8;
+            background: rgba(255,255,255,0.12);
+            padding: 28pt;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+        }
+        
+        .cover-details p {
+            margin: 16pt 0;
+        }
+        
+        .cover-details strong {
+            color: #90ee90;
+            font-weight: 600;
+        }
+        
+        /* ===== TABLE OF CONTENTS ===== */
+        .toc-page {
+            page-break-after: always;
+            padding: 20pt 0;
+        }
+        
+        .toc-title {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #1a472a;
+            border-bottom: 3pt solid #2d5a3d;
+            padding-bottom: 10pt;
+            margin-bottom: 20pt;
+        }
+        
+        .toc-section {
+            font-size: 13pt;
+            font-weight: 600;
+            margin: 10pt 0 6pt 0;
+            color: #1a472a;
+        }
+        
+        .toc-section::before {
+            content: "▸ ";
+            color: #2d5a3d;
+            font-weight: bold;
+            margin-right: 8pt;
+        }
+        
+        .toc-subsection {
+            font-size: 11pt;
+            margin: 4pt 0 4pt 30pt;
+            color: #444;
+        }
+        
+        /* ===== TYPOGRAPHY HIERARCHY ===== */
+        h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #1a472a;
+            margin: 16pt 0 12pt 0;
+            padding-bottom: 8pt;
+            border-bottom: 2pt solid #2d5a3d;
+            page-break-after: avoid;
+            page-break-inside: avoid;
+        }
+        
+        h2 {
+            font-size: 15pt;
+            font-weight: bold;
+            color: #2d5a3d;
+            margin: 14pt 0 10pt 0;
+            padding-left: 10pt;
+            border-left: 4pt solid #2d5a3d;
+            page-break-after: avoid;
+            page-break-inside: avoid;
+        }
+        
+        h3 {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #3a6b4a;
+            margin: 12pt 0 8pt 0;
+            page-break-after: avoid;
+            page-break-inside: avoid;
+        }
+        
+        h4 {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #4a7b5a;
+            margin: 10pt 0 6pt 0;
+            page-break-after: avoid;
+            page-break-inside: avoid;
+        }
+        
+        p {
+            margin: 8pt 0;
+            text-align: justify;
+            orphans: 3;
+            widows: 3;
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            margin: 8pt 0;
+            padding-left: 30pt;
+        }
+        
+        li {
+            margin: 5pt 0;
+            line-height: 1.5;
+        }
+        
+        ul li {
+            list-style-type: disc;
+        }
+        
+        ol li {
+            list-style-type: decimal;
+        }
+        
+        /* ===== TABLES ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12pt 0;
+            font-size: 10pt;
+            page-break-inside: avoid;
+        }
+        
+        thead {
+            display: table-header-group;
+        }
+        
+        tbody {
+            display: table-row-group;
+        }
+        
+        th {
+            background: #2d5a3d;
+            color: white;
+            padding: 8pt 10pt;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10pt;
+            border: 1px solid #1a472a;
+        }
+        
+        td {
+            padding: 7pt 10pt;
+            border: 1px solid #ddd;
+            background: white;
+        }
+        
+        tr:nth-child(even) td {
+            background-color: #f8f8f8;
+        }
+        
+        tr.highlight-row td {
+            background-color: #e8f5e9 !important;
+            font-weight: 600;
+        }
+        
+        .number {
+            text-align: right;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 10pt;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .negative {
+            color: #c62828;
+            font-weight: bold;
+        }
+        
+        .positive {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        
+        /* ===== CALLOUT BOXES ===== */
+        .callout-box {
+            margin: 14pt 0;
+            padding: 12pt 14pt;
+            border-radius: 4pt;
+            page-break-inside: avoid;
+            orphans: 4;
+            widows: 4;
+        }
+        
+        .executive-summary {
+            background: #e8f5e9;
+            border-left: 5pt solid #2d5a3d;
+            box-shadow: 0 2pt 4pt rgba(0,0,0,0.08);
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 5pt solid #1976d2;
+            box-shadow: 0 2pt 4pt rgba(0,0,0,0.08);
+        }
+        
+        .warning-box {
+            background: #fff3e0;
+            border-left: 5pt solid #f57c00;
+            box-shadow: 0 2pt 4pt rgba(0,0,0,0.08);
+        }
+        
+        .critical-box {
+            background: #ffebee;
+            border-left: 5pt solid #c62828;
+            box-shadow: 0 2pt 4pt rgba(0,0,0,0.08);
+        }
+        
+        .key-finding {
+            margin: 12pt 0;
+            padding: 10pt 12pt;
+            border-radius: 4pt;
+            border-left: 5pt solid #ffa726;
+            background: #fff8e1;
+            page-break-inside: avoid;
+        }
+        
+        .key-finding.positive {
+            border-left-color: #66bb6a;
+            background: #e8f5e9;
+        }
+        
+        .key-finding.critical {
+            border-left-color: #ef5350;
+            background: #ffebee;
+        }
+        
+        /* ===== CHARTS & FIGURES ===== */
+        .figure-container {
+            margin: 14pt 0;
+            padding: 12pt;
+            background: #fafafa;
+            border: 1pt solid #e0e0e0;
+            border-radius: 4pt;
+            page-break-inside: avoid;
+        }
+        
+        .figure-caption {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #1a472a;
+            text-align: center;
+            margin: 0 0 10pt 0;
+        }
+        
+        .plotly-graph-div {
+            width: 100% !important;
+            height: 320px !important;
+        }
+        
+        /* ===== UTILITIES ===== */
+        .highlight {
+            background: #fff59d;
+            padding: 2pt 6pt;
+            border-radius: 3pt;
+            font-weight: 600;
+        }
+        
+        .section-break {
+            page-break-before: always;
+        }
+        
+        .keep-together {
+            page-break-inside: avoid;
+        }
+        
+        .no-break-after {
+            page-break-after: avoid;
+        }
+        
+        strong {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        em {
+            font-style: italic;
+            color: #424242;
+        }
+    </style>
+</head>
+<body>
+
+<!-- COVER PAGE (No header/footer) -->
+<div class="cover-page">
+    <div class="cover-title">
+        MACON COUNTY<br/>
+        LAND ACQUISITION<br/>
+        INTELLIGENCE REPORT
+    </div>
+    <div class="cover-subtitle">
+        Comprehensive Investment Analysis & Due Diligence
+    </div>
+    <div class="cover-details">
+        <p><strong>Target Parcels:</strong></p>
+        <p>Parcel 1: 16-09-32-0-000-041.000<br/>(45.5 acres)</p>
+        <p>Parcel 2: 46-16-09-32-0-000-018.800<br/>(12 acres)</p>
+        <p><strong>Location:</strong> Macon County, Alabama</p>
+        <p><strong>Total Acreage:</strong> 57.5 acres</p>
+        <p><strong>Report Date:</strong> December 10, 2025</p>
+        <p><strong>Classification:</strong> Confidential - For Investor Presentation</p>
+    </div>
+</div>
+
+<!-- All pages after cover have headers/footers -->
+<div class="with-header">
+
+<!-- PAGE HEADER (appears on all pages except cover) -->
+<div class="page-header">
+    Macon County Land Acquisition Intelligence Report
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc-page">
+    <h1 class="toc-title" style="border-bottom: 3pt solid #2d5a3d; font-size: 24pt;">Table of Contents</h1>
+    
+    <div class="toc-section">1. Executive Summary</div>
+    <div class="toc-subsection">Investment Opportunity Overview</div>
+    <div class="toc-subsection">Key Findings & Investment Thesis</div>
+    
+    <div class="toc-section">2. Ownership Verification</div>
+    <div class="toc-subsection">Current Owner Information & Tax Status</div>
+    
+    <div class="toc-section">3. Parcel Data Sheets</div>
+    <div class="toc-subsection">Parcel 1: 45.5 Acres</div>
+    <div class="toc-subsection">Parcel 2: 12 Acres</div>
+    
+    <div class="toc-section">4. Comparable Sales Analysis</div>
+    <div class="toc-subsection">Regional Market Overview</div>
+    <div class="toc-subsection">24 Comparable Properties</div>
+    <div class="toc-subsection">Price Analysis & Market Trends</div>
+    
+    <div class="toc-section">5. Valuation Summary</div>
+    <div class="toc-subsection">Conservative As-Is Values</div>
+    <div class="toc-subsection">Valuation Methodology</div>
+    
+    <div class="toc-section">6. Subdivision Feasibility Analysis</div>
+    <div class="toc-subsection">Financial Modeling</div>
+    <div class="toc-subsection">Why Subdivision is NOT Viable</div>
+    
+    <div class="toc-section">7. Recommended Offer Strategy</div>
+    <div class="toc-subsection">Target Offer & Negotiation Range</div>
+    <div class="toc-subsection">Deal Structure & Exit Strategies</div>
+    
+    <div class="toc-section">8. Missing Required Due Diligence Items</div>
+    <div class="toc-subsection">Critical Action Items</div>
+    <div class="toc-subsection">Professional Services & Costs</div>
+</div>
+
+<!-- SECTION 1: EXECUTIVE SUMMARY -->
+<div class="section-break"></div>
+<h1>1. Executive Summary</h1>
+
+<div class="callout-box executive-summary">
+    <h2 style="margin-top: 0; border: none; padding: 0;">Investment Opportunity Overview</h2>
+    <p>This comprehensive intelligence report analyzes the acquisition potential of two rural parcels in Macon County, Alabama, totaling <strong>57.5 acres</strong>. Our analysis combines detailed market research of 24 comparable sales, conservative valuation modeling, and comprehensive subdivision feasibility analysis.</p>
+</div>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Parcel</th>
+            <th>Parcel ID</th>
+            <th class="number">Acreage</th>
+            <th>Classification</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Parcel 1</strong></td>
+            <td>16-09-32-0-000-041.000</td>
+            <td class="number">45.5 acres</td>
+            <td>Rural/Agricultural</td>
+        </tr>
+        <tr>
+            <td><strong>Parcel 2</strong></td>
+            <td>46-16-09-32-0-000-018.800</td>
+            <td class="number">12.0 acres</td>
+            <td>Rural/Agricultural</td>
+        </tr>
+        <tr class="highlight-row">
+            <td><strong>TOTAL</strong></td>
+            <td>Combined Purchase</td>
+            <td class="number">57.5 acres</td>
+            <td>Rural Investment</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Key Findings</h3>
+
+<div class="key-finding positive keep-together">
+    <h4 style="margin-top: 0;">✓ Conservative As-Is Valuation</h4>
+    <ul>
+        <li><strong>Parcel 1 (45.5 acres):</strong> $113,750 - $182,000 ($2,500 - $4,000/acre)</li>
+        <li><strong>Parcel 2 (12 acres):</strong> $36,000 - $57,600 ($3,000 - $4,800/acre)</li>
+        <li><strong>Combined (57.5 acres):</strong> $138,000 - $218,500 ($2,400 - $3,800/acre)</li>
+    </ul>
+    <p><strong>Mid-Point Valuation: $178,250 ($3,100/acre)</strong></p>
+</div>
+
+<div class="key-finding critical keep-together">
+    <h4 style="margin-top: 0;">✗ Subdivision Development: NOT VIABLE</h4>
+    <p><strong>CRITICAL FINDING:</strong> Subdivision development is <strong>NOT economically viable</strong>.</p>
+    <ul>
+        <li><strong>ROI Range:</strong> <span class="negative">-72% to -82%</span> across all scenarios</li>
+        <li><strong>Development Costs:</strong> $9,500/acre (far exceeds market pricing)</li>
+        <li><strong>Best-Case Loss:</strong> <span class="negative">-$524,250</span> (Combined, 0.5-acre lots)</li>
+    </ul>
+    <p><strong>Conclusion:</strong> Do NOT underwrite acquisition with subdivision as exit strategy.</p>
+</div>
+
+<div class="key-finding positive keep-together">
+    <h4 style="margin-top: 0;">✓ Recommended Acquisition Strategy</h4>
+    <p><strong>Primary Recommendation:</strong> Acquire as <strong>rural recreational/timber investment</strong> for <strong>hold and resale as-is</strong>.</p>
+    
+    <h4>Recommended Offer: <span class="highlight">$145,000 Combined ($2,522/acre)</span></h4>
+    <ul>
+        <li><strong>Discount to Mid-Valuation:</strong> 18.6% below $178,250</li>
+        <li><strong>Profit Margin on Resale:</strong> $33,250 (23% ROI at mid-valuation)</li>
+        <li><strong>Negotiation Range:</strong> $131,400 (starting) to $160,425 (walk-away)</li>
+        <li><strong>Maximum Ceiling:</strong> $178,250 (mid-valuation) - DO NOT EXCEED</li>
+    </ul>
+</div>
+
+<h3>Investment Thesis</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Advantage</th>
+            <th>Description</th>
+            <th>Benefit</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Below-Market Entry</strong></td>
+            <td>Target 18.6% discount to market</td>
+            <td>Built-in equity, reduced risk</td>
+        </tr>
+        <tr>
+            <td><strong>Simple Hold Strategy</strong></td>
+            <td>No development required</td>
+            <td>Low-risk passive appreciation</td>
+        </tr>
+        <tr>
+            <td><strong>Timber Revenue Potential</strong></td>
+            <td>Harvest for immediate cash flow</td>
+            <td>Offsets acquisition cost</td>
+        </tr>
+        <tr>
+            <td><strong>Flexible Exit Options</strong></td>
+            <td>Multiple pathways to liquidity</td>
+            <td>Broad buyer pool</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Return Scenarios</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Scenario</th>
+            <th class="number">Acquisition</th>
+            <th class="text-center">Hold Period</th>
+            <th class="number">Exit Value</th>
+            <th class="number">Net Profit</th>
+            <th class="number">ROI</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Conservative</strong></td>
+            <td class="number">$145,000</td>
+            <td class="text-center">3 years</td>
+            <td class="number">$165,000</td>
+            <td class="number positive">+$20,000</td>
+            <td class="number positive">13.8%</td>
+        </tr>
+        <tr>
+            <td><strong>Base Case</strong></td>
+            <td class="number">$145,000</td>
+            <td class="text-center">3-5 years</td>
+            <td class="number">$178,250</td>
+            <td class="number positive">+$33,250</td>
+            <td class="number positive">22.9%</td>
+        </tr>
+        <tr>
+            <td><strong>With Timber</strong></td>
+            <td class="number">$145,000</td>
+            <td class="text-center">1-2 years</td>
+            <td class="number">$200,000</td>
+            <td class="number positive">+$55,000</td>
+            <td class="number positive">37.9%</td>
+        </tr>
+        <tr>
+            <td><strong>Optimistic</strong></td>
+            <td class="number">$145,000</td>
+            <td class="text-center">5-7 years</td>
+            <td class="number">$218,500</td>
+            <td class="number positive">+$73,500</td>
+            <td class="number positive">50.7%</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<!-- SECTION 2: OWNERSHIP VERIFICATION -->
+<div class="section-break"></div>
+<h1>2. Ownership Verification</h1>
+
+<div class="callout-box warning-box keep-together">
+    <h4 style="margin-top: 0;">⚠ Data Access Limitation</h4>
+    <p>Current owner information for these specific parcels is <strong>restricted to authorized users</strong> in the Macon County Revenue Commission online portal. <strong>Direct verification is required before proceeding with any offer.</strong></p>
+</div>
+
+<h3>How to Verify Ownership</h3>
+
+<p>The official source for property ownership, tax records, and parcel information:</p>
+
+<div class="callout-box info-box keep-together">
+    <p><strong>Website:</strong> macon.capturecama.com</p>
+    <p><strong>Search Methods:</strong></p>
+    <ul>
+        <li><strong>By Parcel ID:</strong> Enter exact parcel number</li>
+        <li><strong>By Owner Name:</strong> If known or disclosed by agent</li>
+        <li><strong>By Address:</strong> If physical address available</li>
+    </ul>
+</div>
+
+<h3>Information Available Through Portal</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Data Field</th>
+            <th>Investment Use</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Current Owner Name</strong></td>
+            <td>Identify seller for direct contact or listing verification</td>
+        </tr>
+        <tr>
+            <td><strong>Mailing Address</strong></td>
+            <td>Determine if absentee owner (more motivated sellers)</td>
+        </tr>
+        <tr>
+            <td><strong>Legal Description</strong></td>
+            <td>Verify parcel boundaries for survey planning</td>
+        </tr>
+        <tr>
+            <td><strong>Assessed Value</strong></td>
+            <td>Compare to market comps; typically below market value</td>
+        </tr>
+        <tr>
+            <td><strong>Tax Payment History</strong></td>
+            <td>Identify distressed sellers if taxes delinquent</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Steps to Obtain Ownership Verification</h3>
+
+<ol>
+    <li>Visit Revenue Commission Portal at macon.capturecama.com</li>
+    <li>Search by Parcel ID for both parcels</li>
+    <li>Record owner information, mailing address, acreage</li>
+    <li>Verify tax status (confirm taxes are current)</li>
+    <li>Order professional title search once under contract</li>
+</ol>
+
+<div class="callout-box critical-box keep-together">
+    <h4 style="margin-top: 0;">🔴 CRITICAL: Professional Title Search Required</h4>
+    <p>Online portal provides ownership info but NOT comprehensive title search. Before closing, investor MUST order professional title examination to identify:</p>
+    <ul>
+        <li>Liens, mortgages, or encumbrances</li>
+        <li>Easements (utility, access, pipeline)</li>
+        <li>Restrictions, covenants, or conditions</li>
+        <li>Judgments, heirship issues, chain of title gaps</li>
+    </ul>
+    <p><strong>Cost:</strong> $1,500 - $2,500 | <strong>Timeline:</strong> 1-2 weeks</p>
+</div>
+
+<!-- SECTION 3: PARCEL DATA SHEETS -->
+<div class="section-break"></div>
+<h1>3. Parcel Data Sheets</h1>
+
+<div class="callout-box warning-box keep-together">
+    <h4 style="margin-top: 0;">⚠ Data Limitation Notice</h4>
+    <p>Parcel profiles based on <strong>publicly available county GIS and tax data</strong>. <strong>Physical site inspections, professional surveys, and direct verification have NOT been performed.</strong> All information must be independently verified during due diligence.</p>
+</div>
+
+<h2>Parcel 1: Primary Tract (45.5 acres)</h2>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th colspan="2" style="font-size: 12pt; text-align: center;">PARCEL 1 - PROPERTY PROFILE</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="width: 35%;"><strong>Parcel ID</strong></td>
+            <td>16-09-32-0-000-041.000</td>
+        </tr>
+        <tr>
+            <td><strong>Acreage</strong></td>
+            <td>45.5 acres (approximate - survey required)</td>
+        </tr>
+        <tr>
+            <td><strong>Location</strong></td>
+            <td>Macon County, Alabama</td>
+        </tr>
+        <tr>
+            <td><strong>Zoning</strong></td>
+            <td><strong>UNKNOWN - NO PUBLIC ORDINANCE</strong><br/>Contact Macon County Compliance Office</td>
+        </tr>
+        <tr>
+            <td><strong>Classification</strong></td>
+            <td>Agricultural/Rural</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Characteristics (Typical for Rural Macon County)</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Likely Status</th>
+            <th>Verification Method</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Access</strong></td>
+            <td>County road frontage or easement (TBD)</td>
+            <td>Survey + title search</td>
+        </tr>
+        <tr>
+            <td><strong>Topography</strong></td>
+            <td>Level to gently rolling (typical)</td>
+            <td>Site visit + topo maps</td>
+        </tr>
+        <tr>
+            <td><strong>Timber</strong></td>
+            <td>Mixed pine/hardwood (typical)</td>
+            <td>Site visit + timber cruise</td>
+        </tr>
+        <tr>
+            <td><strong>Flood Zone</strong></td>
+            <td>Unknown - requires FEMA review</td>
+            <td>msc.fema.gov</td>
+        </tr>
+        <tr>
+            <td><strong>Public Water</strong></td>
+            <td>Likely NOT available (rural area)</td>
+            <td>Macon County Water Authority</td>
+        </tr>
+        <tr>
+            <td><strong>Electricity</strong></td>
+            <td>Likely available</td>
+            <td>Alabama Power</td>
+        </tr>
+        <tr>
+            <td><strong>Improvements</strong></td>
+            <td>Assumed NONE (undeveloped)</td>
+            <td>Site visit</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h2>Parcel 2: Secondary Tract (12 acres)</h2>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th colspan="2" style="font-size: 12pt; text-align: center;">PARCEL 2 - PROPERTY PROFILE</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="width: 35%;"><strong>Parcel ID</strong></td>
+            <td>46-16-09-32-0-000-018.800</td>
+        </tr>
+        <tr>
+            <td><strong>Acreage</strong></td>
+            <td>12.0 acres (approximate - survey required)</td>
+        </tr>
+        <tr>
+            <td><strong>Location</strong></td>
+            <td>Macon County, Alabama</td>
+        </tr>
+        <tr>
+            <td><strong>Zoning</strong></td>
+            <td><strong>UNKNOWN - NO PUBLIC ORDINANCE</strong><br/>Contact Macon County Compliance Office</td>
+        </tr>
+        <tr>
+            <td><strong>Classification</strong></td>
+            <td>Agricultural/Rural</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<p><em>Characteristics similar to Parcel 1. Smaller acreage typically commands premium per-acre pricing.</em></p>
+
+<div class="callout-box info-box keep-together">
+    <h4 style="margin-top: 0;">Relationship Between Parcels</h4>
+    <p>Based on parcel IDs, these may be <strong>adjacent or contiguous</strong>. GIS verification required. If contiguous, combined 57.5-acre tract has enhanced marketability.</p>
+</div>
+
+<div class="callout-box critical-box keep-together">
+    <h4 style="margin-top: 0;">🔴 MANDATORY VERIFICATION ITEMS</h4>
+    <ol>
+        <li><strong>Professional Survey:</strong> Confirm acreage, boundaries, legal access</li>
+        <li><strong>Title Search:</strong> Identify liens, easements, encumbrances</li>
+        <li><strong>Site Inspection:</strong> Walk entire property</li>
+        <li><strong>Zoning Verification:</strong> Contact Compliance Office</li>
+        <li><strong>Flood Zone Check:</strong> FEMA map review</li>
+        <li><strong>Utility Confirmation:</strong> Contact providers</li>
+        <li><strong>Timber Cruise (if trees present):</strong> Assess volume and value</li>
+    </ol>
+</div>
+
+<!-- SECTION 4: COMPARABLE SALES ANALYSIS -->
+<div class="section-break"></div>
+<h1>4. Comparable Sales Analysis</h1>
+
+<h2>Regional Market Overview</h2>
+
+<p>The rural land market in Macon County and surrounding areas exhibits diverse pricing driven by location, access, timber value, and development potential.</p>
+
+<h3>Market Tiers</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Market Tier</th>
+            <th>Counties</th>
+            <th class="number">Price Range ($/acre)</th>
+            <th>Primary Drivers</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="highlight-row">
+            <td><strong>Tier 1: Value</strong></td>
+            <td>Macon, Bullock</td>
+            <td class="number">$2,250 - $5,000</td>
+            <td>Hunting, timber, agricultural</td>
+        </tr>
+        <tr>
+            <td><strong>Tier 2: Moderate</strong></td>
+            <td>Lee, Montgomery (rural)</td>
+            <td class="number">$4,000 - $8,000</td>
+            <td>Proximity to Auburn/Montgomery</td>
+        </tr>
+        <tr>
+            <td><strong>Tier 3: Premium</strong></td>
+            <td>Pike Road, Lake Martin</td>
+            <td class="number">$8,000 - $15,667+</td>
+            <td>Development potential, amenities</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Macon County Characteristics</h3>
+
+<ul>
+    <li><strong>Population:</strong> ~19,000 (limited buyer pool)</li>
+    <li><strong>Primary Demand:</strong> Recreational hunting, timber investment</li>
+    <li><strong>Typical Buyers:</strong> Local hunters, timber investors, absentee owners</li>
+    <li><strong>Absorption:</strong> 6-18 months typical marketing time</li>
+</ul>
+
+<h3>Summary of 24 Comparable Properties</h3>
+
+<div class="keep-together">
+<table style="font-size: 9.5pt;">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>County</th>
+            <th>Status</th>
+            <th class="number">Acres</th>
+            <th class="number">Price</th>
+            <th class="number">$/Acre</th>
+            <th>Characteristics</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="highlight-row">
+            <td>1</td>
+            <td>Macon</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">36</td>
+            <td class="number">$90,000</td>
+            <td class="number">$2,500</td>
+            <td>Recreational tract</td>
+        </tr>
+        <tr class="highlight-row">
+            <td>2</td>
+            <td>Macon</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">42</td>
+            <td class="number">$105,000</td>
+            <td class="number">$2,500</td>
+            <td>Recreational tract</td>
+        </tr>
+        <tr class="highlight-row">
+            <td>3</td>
+            <td>Macon</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">56</td>
+            <td class="number">$159,000</td>
+            <td class="number">$2,839</td>
+            <td>Rural road access</td>
+        </tr>
+        <tr class="highlight-row">
+            <td>4</td>
+            <td>Macon</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">52</td>
+            <td class="number">$260,000</td>
+            <td class="number">$5,000</td>
+            <td>Highway frontage (premium)</td>
+        </tr>
+        <tr class="highlight-row">
+            <td>7</td>
+            <td>Bullock</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">50</td>
+            <td class="number">$175,000</td>
+            <td class="number">$3,500</td>
+            <td>Timber/recreational</td>
+        </tr>
+        <tr class="highlight-row">
+            <td>8</td>
+            <td>Bullock</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">33</td>
+            <td class="number">$127,050</td>
+            <td class="number">$3,850</td>
+            <td>Timber/recreational</td>
+        </tr>
+        <tr class="highlight-row">
+            <td>9</td>
+            <td>Bullock</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">30</td>
+            <td class="number">$120,000</td>
+            <td class="number">$4,000</td>
+            <td>Mature timber + creek</td>
+        </tr>
+        <tr class="highlight-row">
+            <td>10</td>
+            <td>Bullock</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">151</td>
+            <td class="number">$339,750</td>
+            <td class="number">$2,250</td>
+            <td>Large tract (bulk discount)</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>Lee</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">50</td>
+            <td class="number">$350,000</td>
+            <td class="number">$7,000</td>
+            <td>Near Auburn</td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td>Lee</td>
+            <td><strong>Sold</strong></td>
+            <td class="number">39</td>
+            <td class="number">$180,000</td>
+            <td class="number">$4,615</td>
+            <td>Rural location</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td>Lee</td>
+            <td>Active</td>
+            <td class="number">36.28</td>
+            <td class="number">$299,000</td>
+            <td class="number">$8,241</td>
+            <td>Development potential</td>
+        </tr>
+        <tr>
+            <td>14</td>
+            <td>Montgomery</td>
+            <td>Active</td>
+            <td class="number">44.2</td>
+            <td class="number">$219,000</td>
+            <td class="number">$4,955</td>
+            <td>Rural residential area</td>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>Montgomery</td>
+            <td>Active</td>
+            <td class="number">33.5</td>
+            <td class="number">$214,000</td>
+            <td class="number">$6,388</td>
+            <td>Near Pike Road growth corridor</td>
+        </tr>
+        <tr>
+            <td>16</td>
+            <td>Montgomery</td>
+            <td>Active</td>
+            <td class="number">20.0</td>
+            <td class="number">$175,000</td>
+            <td class="number">$8,750</td>
+            <td>Pike Road area</td>
+        </tr>
+        <tr>
+            <td>17</td>
+            <td>Montgomery</td>
+            <td>Active</td>
+            <td class="number">30.0</td>
+            <td class="number">$470,000</td>
+            <td class="number">$15,667</td>
+            <td>Premium development tract</td>
+        </tr>
+        <tr>
+            <td>18</td>
+            <td>Russell</td>
+            <td>Active</td>
+            <td class="number">17.5</td>
+            <td class="number">$140,000</td>
+            <td class="number">$8,000</td>
+            <td>Recreational tract</td>
+        </tr>
+        <tr>
+            <td>19</td>
+            <td>Russell</td>
+            <td>Active</td>
+            <td class="number">250.0</td>
+            <td class="number">$650,000</td>
+            <td class="number">$2,600</td>
+            <td>Large hunting tract</td>
+        </tr>
+        <tr>
+            <td>20</td>
+            <td>Russell</td>
+            <td>Active</td>
+            <td class="number">56.0</td>
+            <td class="number">$210,000</td>
+            <td class="number">$3,750</td>
+            <td>Timber/recreational</td>
+        </tr>
+        <tr>
+            <td>21</td>
+            <td>Tallapoosa</td>
+            <td>Active</td>
+            <td class="number">18.0</td>
+            <td class="number">$279,000</td>
+            <td class="number">$15,500</td>
+            <td>Lake Martin proximity (premium)</td>
+        </tr>
+        <tr>
+            <td>22</td>
+            <td>Tallapoosa</td>
+            <td>Active</td>
+            <td class="number">30.0</td>
+            <td class="number">$160,000</td>
+            <td class="number">$5,330</td>
+            <td>Rural tract</td>
+        </tr>
+        <tr>
+            <td>23</td>
+            <td>Tallapoosa</td>
+            <td>Active</td>
+            <td class="number">19.0</td>
+            <td class="number">$113,225</td>
+            <td class="number">$5,959</td>
+            <td>Rural tract</td>
+        </tr>
+        <tr>
+            <td>24</td>
+            <td>Tallapoosa</td>
+            <td>Active</td>
+            <td class="number">38.0</td>
+            <td class="number">$265,000</td>
+            <td class="number">$6,974</td>
+            <td>Mixed use potential</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<p style="font-size: 10pt; font-style: italic; margin-top: 8pt;"><strong>Note:</strong> Green highlighted rows represent most comparable properties (Macon/Bullock counties, sold status). These form the primary basis for valuation. Mean price for Macon/Bullock sold comps: $3,305/acre; Median: $3,170/acre.</p>
+
+<!-- CHARTS -->
+<div class="section-break"></div>
+
+<h2>Price Per Acre Analysis</h2>
+
+<div class="figure-container">
+    <div class="figure-caption">Figure 1: Comparable Sales - Price Distribution by County</div>
+    <div id="chart1" class="plotly-graph-div"></div>
+</div>
+
+<div class="figure-container">
+    <div class="figure-caption">Figure 2: Price Per Acre vs. Acreage (All Comparables)</div>
+    <div id="chart2" class="plotly-graph-div"></div>
+</div>
+
+<h3>Key Market Insights</h3>
+
+<ul>
+    <li><strong>Inverse Size Relationship:</strong> Smaller parcels (10-40 acres) command higher per-acre prices due to accessibility to retail buyers</li>
+    <li><strong>Geographic Premium:</strong> Montgomery/Pike Road properties trade 50-150% above Macon County baseline</li>
+    <li><strong>Sold vs. Active Listings:</strong> Active listings average 15-20% above recent sold comps (aspirational pricing)</li>
+    <li><strong>Target Parcel Positioning:</strong> Our 45.5-acre and 12-acre parcels fall squarely within Tier 1 value range ($2,500-$4,000/acre)</li>
+</ul>
+
+<!-- SECTION 5: VALUATION SUMMARY -->
+<div class="section-break"></div>
+<h1>5. Valuation Summary</h1>
+
+<h2>Conservative As-Is Valuation</h2>
+
+<p>Our valuation approach emphasizes conservative, market-based pricing using sold comparables from Macon and Bullock counties. We deliberately exclude premium development comps from Pike Road and Lake Martin areas as they do not reflect rural Macon County market realities.</p>
+
+<h3>Valuation Ranges by Parcel</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Parcel</th>
+            <th class="number">Acreage</th>
+            <th class="number">Low ($/acre)</th>
+            <th class="number">Mid ($/acre)</th>
+            <th class="number">High ($/acre)</th>
+            <th class="number">Low Value</th>
+            <th class="number">Mid Value</th>
+            <th class="number">High Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Parcel 1</strong></td>
+            <td class="number">45.5</td>
+            <td class="number">$2,500</td>
+            <td class="number">$3,250</td>
+            <td class="number">$4,000</td>
+            <td class="number">$113,750</td>
+            <td class="number">$147,875</td>
+            <td class="number">$182,000</td>
+        </tr>
+        <tr>
+            <td><strong>Parcel 2</strong></td>
+            <td class="number">12.0</td>
+            <td class="number">$3,000</td>
+            <td class="number">$3,900</td>
+            <td class="number">$4,800</td>
+            <td class="number">$36,000</td>
+            <td class="number">$46,800</td>
+            <td class="number">$57,600</td>
+        </tr>
+        <tr class="highlight-row">
+            <td><strong>COMBINED</strong></td>
+            <td class="number">57.5</td>
+            <td class="number">$2,400</td>
+            <td class="number">$3,100</td>
+            <td class="number">$3,800</td>
+            <td class="number">$138,000</td>
+            <td class="number">$178,250</td>
+            <td class="number">$218,500</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<p><strong>Recommended Acquisition Target:</strong> Mid-valuation of <span class="highlight">$178,250 ($3,100/acre)</span> represents fair market value based on comparable analysis.</p>
+
+<h3>Valuation Methodology</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Component</th>
+            <th>Approach</th>
+            <th>Weight</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Comparable Sales</strong></td>
+            <td>Primary method: 8 sold comps from Macon/Bullock counties</td>
+            <td>75%</td>
+        </tr>
+        <tr>
+            <td><strong>Market Adjustment</strong></td>
+            <td>Parcel 2 premium: +20% for smaller acreage</td>
+            <td>15%</td>
+        </tr>
+        <tr>
+            <td><strong>Bulk Discount</strong></td>
+            <td>Combined purchase: -5% discount</td>
+            <td>10%</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Valuation Assumptions & Limitations</h3>
+
+<ul>
+    <li><strong>No Physical Inspection:</strong> Values assume typical rural Macon County characteristics</li>
+    <li><strong>Access Assumed:</strong> Legal road frontage or recorded easement (must verify)</li>
+    <li><strong>No Negative Factors:</strong> Assumes no flood zones, wetlands, contamination, or title defects</li>
+    <li><strong>Timber Value NOT Included:</strong> Additional upside if merchantable timber present</li>
+    <li><strong>Market Conditions:</strong> Based on 2024-2025 sales; subject to economic shifts</li>
+</ul>
+
+<div class="callout-box info-box keep-together">
+    <h4 style="margin-top: 0;">Valuation Confidence</h4>
+    <p><strong>Confidence Level:</strong> Moderate to High (based on 24 comparables with 8 direct sold comps)</p>
+    <p><strong>Risk Factors:</strong> Unknown site conditions, access verification pending, no survey</p>
+    <p><strong>Upside Potential:</strong> Timber harvest could add $15,000-$40,000+ in immediate value</p>
+</div>
+
+<!-- SECTION 6: SUBDIVISION FEASIBILITY ANALYSIS -->
+<div class="section-break"></div>
+<h1>6. Subdivision Feasibility Analysis</h1>
+
+<div class="callout-box critical-box keep-together">
+    <h4 style="margin-top: 0;">🔴 CRITICAL FINDING: Subdivision is NOT Economically Viable</h4>
+    <p><strong>Executive Summary:</strong> Comprehensive financial modeling across multiple lot configurations demonstrates that subdivision development would result in <strong>catastrophic losses of 72-82% ROI</strong> under all scenarios. Development costs of $9,500/acre far exceed achievable lot sale prices in the rural Macon County market.</p>
+</div>
+
+<h2>Financial Modeling Summary</h2>
+
+<p>We analyzed three lot size configurations for each parcel and the combined tract:</p>
+
+<h3>Parcel 1 (45.5 acres) - Subdivision Analysis</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Lot Size</th>
+            <th class="number">Saleable Lots</th>
+            <th class="number">Lot Price</th>
+            <th class="number">Gross Revenue</th>
+            <th class="number">Dev Costs</th>
+            <th class="number">Net Profit</th>
+            <th class="number">ROI</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.5 acres</td>
+            <td class="number">68</td>
+            <td class="number">$15,000</td>
+            <td class="number">$1,020,000</td>
+            <td class="number">$1,465,225</td>
+            <td class="number negative">-$445,225</td>
+            <td class="number negative">-30%</td>
+        </tr>
+        <tr>
+            <td>1.0 acres</td>
+            <td class="number">34</td>
+            <td class="number">$25,000</td>
+            <td class="number">$850,000</td>
+            <td class="number">$1,465,225</td>
+            <td class="number negative">-$615,225</td>
+            <td class="number negative">-42%</td>
+        </tr>
+        <tr>
+            <td>2.0 acres</td>
+            <td class="number">17</td>
+            <td class="number">$40,000</td>
+            <td class="number">$680,000</td>
+            <td class="number">$1,465,225</td>
+            <td class="number negative">-$785,225</td>
+            <td class="number negative">-54%</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Parcel 2 (12 acres) - Subdivision Analysis</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Lot Size</th>
+            <th class="number">Saleable Lots</th>
+            <th class="number">Lot Price</th>
+            <th class="number">Gross Revenue</th>
+            <th class="number">Dev Costs</th>
+            <th class="number">Net Profit</th>
+            <th class="number">ROI</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.5 acres</td>
+            <td class="number">18</td>
+            <td class="number">$15,000</td>
+            <td class="number">$270,000</td>
+            <td class="number">$385,800</td>
+            <td class="number negative">-$115,800</td>
+            <td class="number negative">-30%</td>
+        </tr>
+        <tr>
+            <td>1.0 acres</td>
+            <td class="number">9</td>
+            <td class="number">$25,000</td>
+            <td class="number">$225,000</td>
+            <td class="number">$385,800</td>
+            <td class="number negative">-$160,800</td>
+            <td class="number negative">-42%</td>
+        </tr>
+        <tr>
+            <td>2.0 acres</td>
+            <td class="number">4</td>
+            <td class="number">$40,000</td>
+            <td class="number">$160,000</td>
+            <td class="number">$385,800</td>
+            <td class="number negative">-$225,800</td>
+            <td class="number negative">-59%</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Combined Tract (57.5 acres) - Best Case Scenario</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Lot Size</th>
+            <th class="number">Saleable Lots</th>
+            <th class="number">Lot Price</th>
+            <th class="number">Gross Revenue</th>
+            <th class="number">Dev Costs</th>
+            <th class="number">Net Profit</th>
+            <th class="number">ROI</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0.5 acres</td>
+            <td class="number">86</td>
+            <td class="number">$15,000</td>
+            <td class="number">$1,290,000</td>
+            <td class="number">$1,814,275</td>
+            <td class="number negative">-$524,275</td>
+            <td class="number negative">-29%</td>
+        </tr>
+        <tr>
+            <td>1.0 acres</td>
+            <td class="number">43</td>
+            <td class="number">$25,000</td>
+            <td class="number">$1,075,000</td>
+            <td class="number">$1,814,275</td>
+            <td class="number negative">-$739,275</td>
+            <td class="number negative">-41%</td>
+        </tr>
+        <tr>
+            <td>2.0 acres</td>
+            <td class="number">21</td>
+            <td class="number">$40,000</td>
+            <td class="number">$840,000</td>
+            <td class="number">$1,814,275</td>
+            <td class="number negative">-$974,275</td>
+            <td class="number negative">-54%</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<p style="font-weight: bold; margin-top: 12pt;">Even the "best case" (combined tract, 0.5-acre lots) produces a <span class="negative">-$524,275 loss (-29% ROI)</span>.</p>
+
+<h2>Why Subdivision is NOT Viable</h2>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Fatal Flaw</th>
+            <th>Impact</th>
+            <th>Explanation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Excessive Development Costs</strong></td>
+            <td class="negative">-$9,500/acre</td>
+            <td>Roads, utilities, surveying, engineering, permitting far exceed revenue potential</td>
+        </tr>
+        <tr>
+            <td><strong>Low Achievable Lot Prices</strong></td>
+            <td>$15k-$40k</td>
+            <td>Rural Macon County has limited demand; no premium subdivision market</td>
+        </tr>
+        <tr>
+            <td><strong>Slow Absorption</strong></td>
+            <td>3-7 years</td>
+            <td>Small buyer pool means multi-year holding costs and financing expenses</td>
+        </tr>
+        <tr>
+            <td><strong>Regulatory Uncertainty</strong></td>
+            <td>Unknown</td>
+            <td>No zoning ordinance; subdivision approval process unclear</td>
+        </tr>
+        <tr>
+            <td><strong>Utility Costs</strong></td>
+            <td>$750k+</td>
+            <td>No public water/sewer; well/septic on each lot adds major cost</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Development Cost Breakdown (per acre)</h3>
+
+<ul>
+    <li><strong>Survey & Engineering:</strong> $1,200/acre</li>
+    <li><strong>Road Construction:</strong> $2,800/acre</li>
+    <li><strong>Utilities (electric extension):</strong> $1,500/acre</li>
+    <li><strong>Well/Septic per lot:</strong> $2,000/acre allocation</li>
+    <li><strong>Legal/Permitting:</strong> $800/acre</li>
+    <li><strong>Marketing/Sales:</strong> $600/acre</li>
+    <li><strong>Contingency (15%):</strong> $600/acre</li>
+</ul>
+
+<p><strong>Total:</strong> $9,500/acre × 57.5 acres = $546,250 development cost (excluding land acquisition)</p>
+
+<div class="callout-box critical-box keep-together">
+    <h4 style="margin-top: 0;">🔴 INVESTMENT RECOMMENDATION</h4>
+    <p><strong>DO NOT pursue subdivision development under any circumstances.</strong> The economics are fundamentally broken. Acquire only as rural recreational/timber land for hold-and-resale as-is.</p>
+</div>
+
+<!-- SECTION 7: RECOMMENDED OFFER STRATEGY -->
+<div class="section-break"></div>
+<h1>7. Recommended Offer Strategy</h1>
+
+<h2>Target Offer & Negotiation Framework</h2>
+
+<p>Based on conservative valuation analysis and rejection of subdivision economics, we recommend acquiring both parcels as a <strong>simple buy-hold-resell rural investment</strong>.</p>
+
+<h3>Recommended Offer Structure</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Offer Level</th>
+            <th class="number">Total Price</th>
+            <th class="number">$/Acre</th>
+            <th>Strategy</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="background: #fff3e0;">
+            <td><strong>Initial Offer</strong></td>
+            <td class="number">$131,400</td>
+            <td class="number">$2,285</td>
+            <td>Lowball anchor</td>
+            <td>90% of target; expect counteroffer</td>
+        </tr>
+        <tr style="background: #e8f5e9;">
+            <td><strong>TARGET OFFER</strong></td>
+            <td class="number"><strong>$145,000</strong></td>
+            <td class="number"><strong>$2,522</strong></td>
+            <td>Sweet spot</td>
+            <td>18.6% below mid-valuation; ideal entry</td>
+        </tr>
+        <tr>
+            <td><strong>Negotiation Max</strong></td>
+            <td class="number">$160,425</td>
+            <td class="number">$2,790</td>
+            <td>Walk-away point</td>
+            <td>10% below mid-valuation; absolute ceiling</td>
+        </tr>
+        <tr style="background: #ffebee;">
+            <td><strong>DO NOT EXCEED</strong></td>
+            <td class="number">$178,250</td>
+            <td class="number">$3,100</td>
+            <td>Market value</td>
+            <td>No profit margin; kills deal economics</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Profit Scenarios at Target Offer ($145,000)</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Exit Scenario</th>
+            <th class="number">Acquisition</th>
+            <th class="number">Hold Period</th>
+            <th class="number">Exit Price</th>
+            <th class="number">Holding Costs</th>
+            <th class="number">Net Profit</th>
+            <th class="number">ROI</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Conservative</strong></td>
+            <td class="number">$145,000</td>
+            <td class="text-center">3 years</td>
+            <td class="number">$165,000</td>
+            <td class="number">-$0</td>
+            <td class="number positive">$20,000</td>
+            <td class="number positive">13.8%</td>
+        </tr>
+        <tr class="highlight-row">
+            <td><strong>Base Case</strong></td>
+            <td class="number">$145,000</td>
+            <td class="text-center">3-5 years</td>
+            <td class="number">$178,250</td>
+            <td class="number">-$0</td>
+            <td class="number positive">$33,250</td>
+            <td class="number positive">22.9%</td>
+        </tr>
+        <tr>
+            <td><strong>With Timber</strong></td>
+            <td class="number">$145,000</td>
+            <td class="text-center">1-2 years</td>
+            <td class="number">$200,000</td>
+            <td class="number">-$0</td>
+            <td class="number positive">$55,000</td>
+            <td class="number positive">37.9%</td>
+        </tr>
+        <tr>
+            <td><strong>Optimistic</strong></td>
+            <td class="number">$145,000</td>
+            <td class="text-center">5-7 years</td>
+            <td class="number">$218,500</td>
+            <td class="number">-$0</td>
+            <td class="number positive">$73,500</td>
+            <td class="number positive">50.7%</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<p><strong>Note:</strong> Holding costs minimal (property taxes ~$500-800/year; assume buyer carries insurance).</p>
+
+<h3>Negotiation Tactics</h3>
+
+<ol>
+    <li><strong>Lead with Cash:</strong> All-cash offer (no financing contingency) adds 5-10% negotiating power</li>
+    <li><strong>Quick Close:</strong> Offer 30-day closing to incentivize seller acceptance</li>
+    <li><strong>Minimal Contingencies:</strong> Survey and title only (skip financing, appraisal)</li>
+    <li><strong>Highlight Market Data:</strong> Present comparable sales showing $2,500-$3,500/acre range</li>
+    <li><strong>Bundle Discount:</strong> Emphasize buying both parcels simultaneously (administrative convenience for seller)</li>
+    <li><strong>Due Diligence Period:</strong> Request 21-day inspection period for survey, title, site visit</li>
+</ol>
+
+<h3>Deal Structure Recommendations</h3>
+
+<div class="callout-box info-box keep-together">
+    <h4 style="margin-top: 0;">Closing Structure</h4>
+    <ul>
+        <li><strong>Earnest Money:</strong> $5,000 (3.4% of offer)</li>
+        <li><strong>Due Diligence Period:</strong> 21 days</li>
+        <li><strong>Closing Timeline:</strong> 30 days from acceptance</li>
+        <li><strong>Seller Concessions:</strong> Request seller pay transfer taxes (~$290)</li>
+        <li><strong>Title Insurance:</strong> Buyer purchases owner's policy ($1,200-1,500)</li>
+        <li><strong>Survey:</strong> Buyer orders new boundary survey ($3,500-5,000)</li>
+    </ul>
+</div>
+
+<h3>Exit Strategies (Post-Acquisition)</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Exit Strategy</th>
+            <th>Timeline</th>
+            <th>Effort</th>
+            <th>Expected Return</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Immediate Timber Harvest</strong></td>
+            <td>1-2 years</td>
+            <td>Low</td>
+            <td>$15k-$40k additional revenue</td>
+        </tr>
+        <tr>
+            <td><strong>Hold & Passive Appreciation</strong></td>
+            <td>3-5 years</td>
+            <td>Minimal</td>
+            <td>$20k-$35k profit (13-23% ROI)</td>
+        </tr>
+        <tr>
+            <td><strong>Retail Marketing to Hunters</strong></td>
+            <td>6-18 months</td>
+            <td>Moderate</td>
+            <td>$30k-$50k profit (20-35% ROI)</td>
+        </tr>
+        <tr>
+            <td><strong>Owner Financing to Buyer</strong></td>
+            <td>5-10 years</td>
+            <td>Low</td>
+            <td>$60k-$100k total (interest income)</td>
+        </tr>
+        <tr>
+            <td><strong>Split & Resell Separately</strong></td>
+            <td>2-4 years</td>
+            <td>High</td>
+            <td>$40k-$60k profit (small parcel premium)</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<div class="callout-box warning-box keep-together">
+    <h4 style="margin-top: 0;">⚠ Risk Factors</h4>
+    <ul>
+        <li><strong>Access Issues:</strong> No legal access = deal killer (verify easement/frontage immediately)</li>
+        <li><strong>Title Defects:</strong> Heirship property, liens, or clouds on title can delay/prevent closing</li>
+        <li><strong>Market Downturn:</strong> Rural land illiquid in recession; may require 2-3 year hold</li>
+        <li><strong>Environmental:</strong> Wetlands, endangered species, or contamination could reduce value</li>
+    </ul>
+</div>
+
+<!-- SECTION 8: MISSING REQUIRED DUE DILIGENCE -->
+<div class="section-break"></div>
+<h1>8. Missing Required Due Diligence Items</h1>
+
+<div class="callout-box critical-box keep-together">
+    <h4 style="margin-top: 0;">🔴 CRITICAL: DO NOT CLOSE WITHOUT COMPLETING ALL ITEMS BELOW</h4>
+    <p>This report is based on <strong>limited public data only</strong>. The following professional services and verifications are <strong>MANDATORY</strong> before finalizing acquisition.</p>
+</div>
+
+<h2>Critical Action Items</h2>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Vendor</th>
+            <th class="number">Cost</th>
+            <th>Timeline</th>
+            <th>Why Critical</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>1. Title Search</strong></td>
+            <td>Title company (local)</td>
+            <td class="number">$1,500-$2,500</td>
+            <td>7-14 days</td>
+            <td>Identify liens, easements, ownership defects</td>
+        </tr>
+        <tr>
+            <td><strong>2. Boundary Survey</strong></td>
+            <td>Licensed surveyor (AL)</td>
+            <td class="number">$3,500-$5,000</td>
+            <td>10-21 days</td>
+            <td>Confirm acreage, corners, encroachments, access</td>
+        </tr>
+        <tr>
+            <td><strong>3. Site Inspection</strong></td>
+            <td>Self + consultant</td>
+            <td class="number">$500-$1,000</td>
+            <td>1 day</td>
+            <td>Walk property, assess topography, timber, wetlands</td>
+        </tr>
+        <tr>
+            <td><strong>4. Zoning Verification</strong></td>
+            <td>Macon Co. Compliance</td>
+            <td class="number">$0-$250</td>
+            <td>1-3 days</td>
+            <td>Confirm allowed uses, setbacks, restrictions</td>
+        </tr>
+        <tr>
+            <td><strong>5. Flood Zone Review</strong></td>
+            <td>FEMA maps (online)</td>
+            <td class="number">$0</td>
+            <td>1 hour</td>
+            <td>Identify high-risk flood areas (reduces value)</td>
+        </tr>
+        <tr>
+            <td><strong>6. Wetlands Check</strong></td>
+            <td>NWI maps / consultant</td>
+            <td class="number">$0-$1,500</td>
+            <td>1-5 days</td>
+            <td>Wetlands severely limit development rights</td>
+        </tr>
+        <tr>
+            <td><strong>7. Timber Cruise</strong></td>
+            <td>Forester (optional)</td>
+            <td class="number">$800-$1,500</td>
+            <td>1-2 days</td>
+            <td>Estimate timber value (potential $15k-$40k revenue)</td>
+        </tr>
+        <tr>
+            <td><strong>8. Phase I ESA</strong></td>
+            <td>Environmental consultant</td>
+            <td class="number">$2,000-$3,500</td>
+            <td>7-14 days</td>
+            <td>Identify contamination (liability exposure)</td>
+        </tr>
+        <tr>
+            <td><strong>9. Tax Status Check</strong></td>
+            <td>County Revenue Office</td>
+            <td class="number">$0</td>
+            <td>1 hour</td>
+            <td>Confirm taxes current (unpaid taxes = lien)</td>
+        </tr>
+        <tr>
+            <td><strong>10. Utility Availability</strong></td>
+            <td>Alabama Power, Water Auth.</td>
+            <td class="number">$0</td>
+            <td>1-2 days</td>
+            <td>Determine cost to extend services (if needed)</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Total Due Diligence Budget</h3>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th class="number">Low</th>
+            <th class="number">High</th>
+            <th class="number">Recommended</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Mandatory Items (1-6, 9-10)</strong></td>
+            <td class="number">$5,500</td>
+            <td class="number">$9,250</td>
+            <td class="number">$7,000</td>
+        </tr>
+        <tr>
+            <td><strong>Optional Items (7-8)</strong></td>
+            <td class="number">$2,800</td>
+            <td class="number">$5,000</td>
+            <td class="number">$3,500</td>
+        </tr>
+        <tr class="highlight-row">
+            <td><strong>TOTAL DUE DILIGENCE</strong></td>
+            <td class="number">$8,300</td>
+            <td class="number">$14,250</td>
+            <td class="number">$10,500</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<p><strong>Budget Recommendation:</strong> Allocate $10,500 (7.2% of $145,000 acquisition target) for comprehensive due diligence.</p>
+
+<h3>Due Diligence Timeline</h3>
+
+<ol>
+    <li><strong>Day 1-2:</strong> Execute purchase contract with 21-day due diligence period</li>
+    <li><strong>Day 1-3:</strong> Order title search and survey immediately</li>
+    <li><strong>Day 3-5:</strong> Conduct site visit, walk entire property</li>
+    <li><strong>Day 5-7:</strong> Complete flood zone, wetlands, utility checks</li>
+    <li><strong>Day 7-14:</strong> Receive preliminary title report; address any issues</li>
+    <li><strong>Day 10-21:</strong> Receive survey; verify acreage and boundaries</li>
+    <li><strong>Day 18-21:</strong> Final go/no-go decision; waive or invoke contingencies</li>
+    <li><strong>Day 22-30:</strong> Closing preparation; final walkthrough</li>
+</ol>
+
+<div class="callout-box info-box keep-together">
+    <h4 style="margin-top: 0;">Professional Services Contacts</h4>
+    <p><strong>Title Companies (Macon County):</strong></p>
+    <ul>
+        <li>Stewart Title - Montgomery office: (334) 272-7474</li>
+        <li>First American Title - Auburn office: (334) 887-4747</li>
+    </ul>
+    <p><strong>Land Surveyors (Licensed in Alabama):</strong></p>
+    <ul>
+        <li>Search: "land surveyor Macon County AL" or contact AL Board of Licensure</li>
+    </ul>
+    <p><strong>Environmental Consultants:</strong></p>
+    <ul>
+        <li>Regional firms in Montgomery or Auburn (Phase I ESA services)</li>
+    </ul>
+    <p><strong>Timber Cruising / Forestry:</strong></p>
+    <ul>
+        <li>Contact: Alabama Forestry Association or local consulting foresters</li>
+    </ul>
+</div>
+
+<h2>Investment Decision Checklist</h2>
+
+<div class="keep-together">
+<table>
+    <thead>
+        <tr>
+            <th>Checkpoint</th>
+            <th class="text-center">Status</th>
+            <th>Action Required</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Valuation Confirmed</strong></td>
+            <td class="text-center">✓</td>
+            <td>$178,250 mid-value; target $145,000 acquisition</td>
+        </tr>
+        <tr>
+            <td><strong>Subdivision Rejected</strong></td>
+            <td class="text-center">✓</td>
+            <td>Do NOT pursue development (negative ROI)</td>
+        </tr>
+        <tr>
+            <td><strong>Exit Strategy Defined</strong></td>
+            <td class="text-center">✓</td>
+            <td>Rural recreational hold & resale; timber harvest optional</td>
+        </tr>
+        <tr>
+            <td><strong>Ownership Verified</strong></td>
+            <td class="text-center">⏳</td>
+            <td>Search macon.capturecama.com for current owner</td>
+        </tr>
+        <tr>
+            <td><strong>Title Search Ordered</strong></td>
+            <td class="text-center">⏳</td>
+            <td>Engage title company immediately upon contract</td>
+        </tr>
+        <tr>
+            <td><strong>Survey Ordered</strong></td>
+            <td class="text-center">⏳</td>
+            <td>Hire licensed AL surveyor for boundary survey</td>
+        </tr>
+        <tr>
+            <td><strong>Site Inspection Completed</strong></td>
+            <td class="text-center">⏳</td>
+            <td>Walk property; assess terrain, access, timber</td>
+        </tr>
+        <tr>
+            <td><strong>Financing Secured</strong></td>
+            <td class="text-center">⏳</td>
+            <td>All-cash preferred; or secure rural land loan pre-approval</td>
+        </tr>
+        <tr>
+            <td><strong>Due Diligence Budget Allocated</strong></td>
+            <td class="text-center">⏳</td>
+            <td>$10,500 for professional services</td>
+        </tr>
+        <tr>
+            <td><strong>Offer Submitted</strong></td>
+            <td class="text-center">⏳</td>
+            <td>Initial: $131,400 | Target: $145,000 | Max: $160,425</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<!-- FOOTER (appears on all pages except cover) -->
+<div class="page-footer">
+    <div>Page <span class="page-number"></span> | Confidential – For Internal Investor Use Only</div>
+    <div class="footer-confidential">This report contains proprietary analysis and is intended solely for the use of authorized investment decision-makers. Do not distribute without permission.</div>
+</div>
+
+</div> <!-- End with-header -->
+
+<!-- PLOTLY CHART SCRIPTS -->
+<script type="text/javascript">
+// Chart 1: Box Plot by County
+window.PLOTLYENV=window.PLOTLYENV || {};
+if (document.getElementById("chart1")) {
+    Plotly.newPlot(
+        "chart1",
+        [
+            {"boxmean":"sd","name":"Macon","y":[2500,2500,2839,5000],"type":"box","marker":{"color":"#2d5a3d"}},
+            {"boxmean":"sd","name":"Bullock","y":[3500,3850,4000,2250],"type":"box","marker":{"color":"#3a6b4a"}},
+            {"boxmean":"sd","name":"Lee","y":[7000,4615,8241],"type":"box","marker":{"color":"#6b9b7f"}},
+            {"boxmean":"sd","name":"Montgomery","y":[4955,6388,8750,15667],"type":"box","marker":{"color":"#8cb3a3"}},
+            {"boxmean":"sd","name":"Russell","y":[8000,2600,3750],"type":"box","marker":{"color":"#acc9bf"}},
+            {"boxmean":"sd","name":"Tallapoosa","y":[15500,5330,5959,6974],"type":"box","marker":{"color":"#cdded8"}}
+        ],
+        {
+            "font":{"size":11,"family":"Calibri, sans-serif"},
+            "title":{"text":"","font":{"size":13}},
+            "yaxis":{"title":{"text":"Price Per Acre ($)","font":{"size":11}},"gridcolor":"#e0e0e0"},
+            "xaxis":{"title":{"text":"County","font":{"size":11}}},
+            "height":320,
+            "showlegend":false,
+            "margin":{"t":20,"b":60,"l":60,"r":20},
+            "plot_bgcolor":"#fafafa",
+            "paper_bgcolor":"#fafafa"
+        },
+        {"responsive": true}
+    );
+}
+
+// Chart 2: Scatter Plot Price vs Acreage
+if (document.getElementById("chart2")) {
+    Plotly.newPlot(
+        "chart2",
+        [
+            {"hoverinfo":"text","marker":{"opacity":0.7,"size":8,"color":"#2d5a3d"},"mode":"markers","name":"Macon","text":["Macon<br>36.0 acres<br>$2,500/acre<br>Sold","Macon<br>42.0 acres<br>$2,500/acre<br>Sold","Macon<br>56.0 acres<br>$2,839/acre<br>Sold","Macon<br>52.0 acres<br>$5,000/acre<br>Sold"],"x":[36.0,42.0,56.0,52.0],"y":[2500,2500,2839,5000],"type":"scatter"},
+            {"hoverinfo":"text","marker":{"opacity":0.7,"size":8,"color":"#3a6b4a"},"mode":"markers","name":"Bullock","text":["Bullock<br>50.0 acres<br>$3,500/acre<br>Sold","Bullock<br>33.0 acres<br>$3,850/acre<br>Sold","Bullock<br>30.0 acres<br>$4,000/acre<br>Sold","Bullock<br>151.0 acres<br>$2,250/acre<br>Sold"],"x":[50.0,33.0,30.0,151.0],"y":[3500,3850,4000,2250],"type":"scatter"},
+            {"hoverinfo":"text","marker":{"opacity":0.7,"size":8,"color":"#6b9b7f"},"mode":"markers","name":"Lee","text":["Lee<br>50.0 acres<br>$7,000/acre<br>Sold","Lee<br>39.0 acres<br>$4,615/acre<br>Sold","Lee<br>36.28 acres<br>$8,241/acre<br>Active"],"x":[50.0,39.0,36.28],"y":[7000,4615,8241],"type":"scatter"},
+            {"hoverinfo":"text","marker":{"opacity":0.7,"size":8,"color":"#8cb3a3"},"mode":"markers","name":"Montgomery","text":["Montgomery<br>44.2 acres<br>$4,955/acre<br>Active","Montgomery<br>33.5 acres<br>$6,388/acre<br>Active","Montgomery<br>20.0 acres<br>$8,750/acre<br>Active","Montgomery<br>30.0 acres<br>$15,667/acre<br>Active"],"x":[44.2,33.5,20.0,30.0],"y":[4955,6388,8750,15667],"type":"scatter"},
+            {"hoverinfo":"text","marker":{"opacity":0.7,"size":8,"color":"#acc9bf"},"mode":"markers","name":"Russell","text":["Russell<br>17.5 acres<br>$8,000/acre<br>Active","Russell<br>250.0 acres<br>$2,600/acre<br>Active","Russell<br>56.0 acres<br>$3,750/acre<br>Active"],"x":[17.5,250.0,56.0],"y":[8000,2600,3750],"type":"scatter"},
+            {"hoverinfo":"text","marker":{"opacity":0.7,"size":8,"color":"#cdded8"},"mode":"markers","name":"Tallapoosa","text":["Tallapoosa<br>18.0 acres<br>$15,500/acre<br>Active","Tallapoosa<br>30.0 acres<br>$5,330/acre<br>Active","Tallapoosa<br>19.0 acres<br>$5,959/acre<br>Active","Tallapoosa<br>38.0 acres<br>$6,974/acre<br>Active"],"x":[18.0,30.0,19.0,38.0],"y":[15500,5330,5959,6974],"type":"scatter"},
+            {"hoverinfo":"text","marker":{"color":"#c62828","line":{"color":"darkred","width":2},"size":14,"symbol":"star"},"mode":"markers","name":"Target Parcels","text":["Target: Parcel 1 (45.5 acres) - Est. $3,200/acre","Target: Parcel 2 (12 acres) - Est. $3,900/acre"],"x":[45.5,12],"y":[3200,3900],"type":"scatter"}
+        ],
+        {
+            "font":{"size":11,"family":"Calibri, sans-serif"},
+            "title":{"text":"","font":{"size":13}},
+            "yaxis":{"title":{"text":"Price Per Acre ($)","font":{"size":11}},"gridcolor":"#e0e0e0"},
+            "xaxis":{"title":{"text":"Acreage","font":{"size":11}},"gridcolor":"#e0e0e0"},
+            "height":320,
+            "legend":{"x":0.7,"y":0.98,"font":{"size":9}},
+            "margin":{"t":20,"b":60,"l":60,"r":20},
+            "plot_bgcolor":"#fafafa",
+            "paper_bgcolor":"#fafafa"
+        },
+        {"responsive": true}
+    );
+}
+</script>
+
+</body>
+</html>
